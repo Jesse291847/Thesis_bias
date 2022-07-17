@@ -22,7 +22,7 @@ results <- parSim(
     # Setup:
     name = paste0("sumScoreSims2_v1_", args[1]),
     write = FALSE,
-    reps = 1,
+    reps = 100,
     debug = FALSE,
 
     # The simulation code:
