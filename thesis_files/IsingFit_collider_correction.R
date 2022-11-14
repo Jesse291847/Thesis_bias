@@ -1,7 +1,7 @@
 library(glmnet)
 library(qgraph)
-IsingFit_sumscore_corr <-
-  function(x, family = "binomial", AND = TRUE, gamma = 0.25, plot = TRUE, progressbar = TRUE, min_sumscore, lowerbound.lambda = NA, ...) {
+IsingFit_correction <-
+  function(x, family = "binomial", AND = TRUE, gamma = 0.25, plot = TRUE, progressbar = TRUE, min_sumscore = 0, lowerbound.lambda = NA, ...) {
     t0 <- Sys.time()
     xx <- x
     if (family != "binomial") {
@@ -48,7 +48,7 @@ IsingFit_sumscore_corr <-
     nlambdas <- rep(0, nvar)
     N <- vector()
     for (i in 1:nvar) {
-      subData <- x[rowSums(x[, -i, drop = FALSE]) != (min_sumscore - 1), ]
+      subData <- x[rowSums(replace(x[, -i, drop = FALSE], x[, -i, drop = FALSE] < 0, 0)) != (min_sumscore - 1), ]
       a <- glmnet(subData[, -i], subData[, i], family = "binomial")
       intercepts[[i]] <- a$a0
       betas[[i]] <- a$beta
@@ -70,7 +70,8 @@ IsingFit_sumscore_corr <-
     }
 
     for (i in 1:nvar) { # i <- 1
-      subData <- x[rowSums(x[, -i, drop = FALSE]) != (min_sumscore - 1), ]
+      
+      subData <- x[rowSums(replace(x[, -i, drop = FALSE], x[, -i, drop = FALSE] < 0, 0)) != (min_sumscore - 1), ]
       sample_size <- N[i]
       betas.ii <- as.matrix(betas[[i]])
       int.ii <- intercepts[[i]]
@@ -91,12 +92,13 @@ IsingFit_sumscore_corr <-
       # calculate P matrix
       P_M[[i]] <- exp(y * subData[, i]) / (1 + exp(y))
       logl_M[[i]] <- log(P_M[[i]])
+      if (progressbar==TRUE) setTxtProgressBar(pb, i)
     }
 
     for (i in 1:nvar) {
       sumlogl[, i] <- colSums(logl_M[[i]])
     }
-    # if (progressbar==TRUE) close(pb)
+    if (progressbar==TRUE) close(pb)
     sumlogl[sumlogl == 0] <- NA
 
     for (i in 1:nvar) {
@@ -154,3 +156,53 @@ IsingFit_sumscore_corr <-
     class(Res) <- "IsingFit"
     return(Res)
   }
+
+plot.IsingFit_correction <- function(object,...) qgraph(object$q,DoNotPlot = FALSE, ...)
+
+print.IsingFit_correction <- function(x)
+{
+  cat("Estimated network:\n")
+  
+  print(round(x$weiadj,2))
+  
+  cat("\n\nEstimated Thresholds:\n")
+  
+  print(x$thresholds)  
+}
+
+summary.IsingFit_correction <- function(object)
+{
+  cat("\tNetwork Density:\t\t", round(mean(object$weiadj[upper.tri(object$weiadj)]!=0),2),"\n",
+      "Gamma:\t\t\t",round(object$gamma,2),"\n",
+      "Rule used:\t\t",ifelse(object$AND,"And-rule","Or-rule"),"\n",
+      "Analysis took:\t\t",format(object$time,format="%s"),"\n"
+  )
+}
+
+# a function for testing without eLasso
+univariate <- function(data, min_sumscore){
+  # Check input:
+  data <- as.matrix(data)
+  stopifnot(all(unlist(data) %in% c(0,1)))
+  
+  # Number of nodes:
+  nNode <- ncol(data)
+  
+  # Output graph:
+  outgraph <- matrix(0,nNode,nNode)
+  
+  # nodewise regressions:
+  for (i in seq_len(nNode)){
+    # Cut out the cases for which s = k-1:
+    subData <- data[rowSums(data[,-i,drop=FALSE]) != (min_sumscore - 1), ]
+    glmres <- glm(subData[,i] ~ subData[,-i,drop=FALSE], family = binomial('logit'))
+    outgraph[i,-i] <- coef(glmres)[-1]
+  }
+  
+  # Make symmetrical:
+  outgraph <- 0.5 * (outgraph + t(outgraph))
+  
+  # Return:
+  return(outgraph)
+}
+
