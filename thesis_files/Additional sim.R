@@ -31,14 +31,27 @@ results <- parSim(
   
   # Setup:
   write = FALSE,
-  reps = 10,
+  reps = 100,
   debug = FALSE,
+  nCores = 16,
   
   # The simulation code:
   expression = {
+    library(IsingSampler)
+    library(tidyverse)
+    library(IsingFit)
+    library(parSim)
+    
+    source("comparison_functions.R")
+    source("IsingFit_correction.R")
+    
+    #reading empirical 
+    #weights and thresholds from Cramer paper
+    weights <- read.delim("Cramer_par/EmpiricalWeightParameters.txt")
+    thresholds <- read.delim("Cramer_par/EmpiricalThresholdParameters.txt", header = FALSE)
     
     # Select data:
-    population <- as.data.frame(IsingSampler(sample_size, as.matrix(weights), pull(thresholds)))
+    population <- readRDS("objects/large_population_sim.RDS") %>% slice_sample(n = sample_size)
     
     # network estimation
     
