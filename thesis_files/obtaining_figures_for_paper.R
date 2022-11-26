@@ -59,13 +59,13 @@ density <- length(non_zero) / length(all_edges)
 
 ### simulate datasets for simulation study ###
 # for multiple simulations not too large so easy to store in memory
-population <- as.data.frame(IsingSampler(300000, as.matrix(weights), pull(thresholds)))
+population <- as.data.frame(IsingSampler(400000, as.matrix(weights), pull(thresholds), method = "CFTP"))
 saveRDS(population, "population_simulation.RDS")
-# one large dataset for single run
-large_population <- as.data.frame(IsingSampler(2000000, as.matrix(weights), pull(thresholds)))
+# one large dataset for big simulations
+large_population <- as.data.frame(IsingSampler(10000000, as.matrix(weights), pull(thresholds), method = "CFTP"))
 
-# select only eligible cases and make it a nice round number
-severe_pop_large <- large_population[rowSums(large_population) >= 5, ] %>% slice_sample(n = 400000)
+# select only eligible cases
+severe_pop_large <- large_population[rowSums(large_population) >= 5, ]#  %>% slice_sample(n = 400000)
 
 #save to external file
 saveRDS(severe_pop_large, "large_severe_pop_sim.RDS")
