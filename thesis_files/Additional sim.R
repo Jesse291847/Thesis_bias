@@ -3,24 +3,24 @@ library(tidyverse)
 library(IsingFit)
 library(parSim)
 
-source("comparison_functions.R")
-source("IsingFit_correction.R")
+# source("comparison_functions.R")
+# source("IsingFit_correction.R")
 
-#reading empirical 
-#weights and thresholds from Cramer paper
-weights <- read.delim("Cramer_par/EmpiricalWeightParameters.txt")
-thresholds <- read.delim("Cramer_par/EmpiricalThresholdParameters.txt", header = FALSE)
-
-# because I change the parameters I don't want to show the symptom names
-rownames(weights) <- colnames(weights) <- paste0(rep("S", 14), 1:14)
-
-# making changes to obtain enough variance
-weights[-1, 1] <- round(weights[-1, 1] * 0.5, digits = 4)
-weights[-c(1, 2), 2] <- round(weights[-c(1, 2), 2] * 0.5, digits = 4)
-
-
-weights[upper.tri(weights)] <- t(weights)[upper.tri(weights)]
-thresholds <- thresholds * 0.75
+# #reading empirical 
+# #weights and thresholds from Cramer paper
+# weights <- read.delim("Cramer_par/EmpiricalWeightParameters.txt")
+# thresholds <- read.delim("Cramer_par/EmpiricalThresholdParameters.txt", header = FALSE)
+# 
+# # because I change the parameters I don't want to show the symptom names
+# rownames(weights) <- colnames(weights) <- paste0(rep("S", 14), 1:14)
+# 
+# # making changes to obtain enough variance
+# weights[-1, 1] <- round(weights[-1, 1] * 0.5, digits = 4)
+# weights[-c(1, 2), 2] <- round(weights[-c(1, 2), 2] * 0.5, digits = 4)
+# 
+# 
+# weights[upper.tri(weights)] <- t(weights)[upper.tri(weights)]
+# thresholds <- thresholds * 0.75
 
 results <- parSim(
   

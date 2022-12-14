@@ -1,7 +1,7 @@
 library(tidyverse)
 library(reshape2)
 
-results <- readRDS("objects/results_100_runs.RDS")
+results <- readRDS("../results_100_runs.RDS")
 results <- results %>% select(-c(error, errorMessage))
 
 #reshaping results to plot

@@ -1,7 +1,7 @@
 library(tidyverse)
 library(reshape2)
 
-results <- readRDS("objects/results_100_runs.RDS")
+results <- readRDS("results_100_runs.RDS")
 #check if errors occurred 
 if(sum(results$error) == 0){
   results <- results %>% select(-c(error, errorMessage))

@@ -57,15 +57,22 @@ average_strength <- mean(abs(non_zero))
 density <- length(non_zero) / length(all_edges)
 
 
+# Save to file:
+saveRDS(weights, "objects/true_network.RDS")
+
 ### simulate datasets for simulation study ###
-# for multiple simulations not too large so easy to store in memory
-population <- as.data.frame(IsingSampler(400000, as.matrix(weights), pull(thresholds), method = "CFTP"))
-saveRDS(population, "population_simulation.RDS")
-# one large dataset for big simulations
+# # for multiple simulations not too large so easy to store in memory
+# population <- as.data.frame(IsingSampler(400000, as.matrix(weights), pull(thresholds), method = "CFTP"))
+# saveRDS(population, "population_simulation.RDS")
+
+# SE: One large dataset for all simulations:
 large_population <- as.data.frame(IsingSampler(10000000, as.matrix(weights), pull(thresholds), method = "CFTP"))
+
+# Save the object:
+saveRDS(large_population, "objects/large_population_sim.RDS")
 
 # select only eligible cases
 severe_pop_large <- large_population[rowSums(large_population) >= 5, ]#  %>% slice_sample(n = 400000)
 
 #save to external file
-saveRDS(severe_pop_large, "large_severe_pop_sim.RDS")
+saveRDS(severe_pop_large, "objects/large_severe_pop_sim.RDS")
