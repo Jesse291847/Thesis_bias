@@ -7,8 +7,9 @@ library(IsingFit)
 library(glmnet)
 source("comparison_functions.R")
 source("IsingFit_correction.R")
-population <- readRDS("objects/population_simulation.RDS")
-true_network <- readRDS("objects/true_network.RDS")
+
+# population <- readRDS("objects/population_simulation.RDS")
+# true_network <- readRDS("objects/true_network.RDS")
 
 
 ### SIMULATION SETUP ###
@@ -20,12 +21,12 @@ results <- parSim(
 
 
     # Setup:
-    name = paste0("sumScoreSims2_v1_", args[1]),
     write = FALSE,
     reps = 100,
     debug = FALSE,
+    progressbar = FALSE,
     
-    nCores = 16,
+    nCores = 24,
 
     # The simulation code:
     expression = {
@@ -39,6 +40,7 @@ results <- parSim(
       library(glmnet)
       source("comparison_functions.R")
       source("IsingFit_correction.R")
+      
       population <- readRDS("objects/large_population_sim.RDS")
       true_network <- readRDS("objects/true_network.RDS")
 
