@@ -45,10 +45,9 @@ results <- parSim(
     source("comparison_functions.R")
     source("IsingFit_correction.R")
     
-    #reading empirical 
-    #weights and thresholds from Cramer paper
-    weights <- read.delim("Cramer_par/EmpiricalWeightParameters.txt")
-    thresholds <- read.delim("Cramer_par/EmpiricalThresholdParameters.txt", header = FALSE)
+    #loading true network
+    weights <- read.delim("objects/true_network.txt")
+   
     
     # Select data:
     population <- readRDS("objects/large_population_sim.RDS") %>% slice_sample(n = sample_size)

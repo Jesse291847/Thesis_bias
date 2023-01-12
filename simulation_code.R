@@ -72,27 +72,28 @@ results <- parSim(
 
 #save simulation results to external file
 saveRDS(results, "results_100_runs.RDS")
-# 
-# #loading a large population all with at least a sum score of 5
-# large_severe_pop <- readRDS("objects/large_severe_pop_sim.RDS")
-# 
-# #estimating the networks depends on the esimation method
-# regular <- IsingFit(large_severe_pop, plot = FALSE, progressbar = FALSE)$weiadj
-# correction <- IsingFit_sumscore_corr(large_severe_pop, sumscore = 5, plot = FALSE, progressbar = FALSE)$weiadj
-# 
-# results_single_run <- data.frame(
-#   Sensitivity_regular = calculate_sensitivity(regular, true_network),
-#   Specificity_regular = calculate_specificity(regular, true_network),
-#   Correlation_regular = calculate_correlation(regular, true_network),
-#   SpurNegEdges_regular = calculate_spur_neg_edges(regular, true_network),
-#   Estimation_error_regular = calculate_estimation_error(regular, true_network),
-#   Sensitivity_correction = calculate_sensitivity(correction, true_network),
-#   Specificity_correction = calculate_specificity(correction, true_network),
-#   Correlation_correction = calculate_correlation(correction, true_network),
-#   SpurNegEdges_correction = calculate_spur_neg_edges(correction, true_network),
-#   Estimation_error_correction = calculate_estimation_error(correction, true_network)
-# )
-# 
-# #save to external file
-# saveRDS(results_single_run, "results_large_pop.RDS")
 
+#loading a large population all with at least a sum score of 5
+population <- readRDS("objects/large_population_sim.RDS") %>% slice_sample(n = 400,000)
+true_network <- readRDS("objects/true_network.RDS")
+
+#estimating the networks depends on the esimation method
+regular <- IsingFit(population, plot = FALSE, progressbar = FALSE)$weiadj
+correction <- IsingFit_correction(large_severe_pop, sumscore = 5, plot = FALSE, progressbar = FALSE)$weiadj
+
+results_single_run <- data.frame(
+  Sensitivity_regular = calculate_sensitivity(regular, true_network),
+  Specificity_regular = calculate_specificity(regular, true_network),
+  Correlation_regular = calculate_correlation(regular, true_network),
+  SpurNegEdges_regular = calculate_spur_neg_edges(regular, true_network),
+  Estimation_error_regular = calculate_estimation_error(regular, true_network),
+  Sensitivity_correction = calculate_sensitivity(correction, true_network),
+  Specificity_correction = calculate_specificity(correction, true_network),
+  Correlation_correction = calculate_correlation(correction, true_network),
+  SpurNegEdges_correction = calculate_spur_neg_edges(correction, true_network),
+  Estimation_error_correction = calculate_estimation_error(correction, true_network)
+)
+
+#save to external file
+saveRDS(results_single_run, "results_large_pop.RDS")
+population

@@ -1,5 +1,6 @@
 library(tidyverse)
 library(reshape2)
+library(ggpubr)
 
 results <- readRDS("results_100_runs.RDS")
 #check if errors occurred 
@@ -25,7 +26,7 @@ p1 <- results %>% filter(cutoff == 5 & outcome != "Estimation Error") %>%
   geom_boxplot() +
   facet_wrap(~outcome) +
   theme_bw() +
-  scale_fill_discrete(name = "Condition") +
+  scale_fill_discrete(name = "Condition", labels = c("Corrected", "Uncorrected")) +
   theme(legend.position = "bottom") +
   labs(x = "Sample size", y = "")
 
@@ -41,7 +42,9 @@ p2 <- results %>% filter(cutoff == 5 & outcome == "Estimation Error") %>%
   
 #saving plots to pdf
 pdf("plot_results_com.pdf")
-p1
-p2
+ggarrange(p2, p1, nrow = 2, ncol = 1, heights = c(0.5, 1))
 dev.off()
+
+
+
 
